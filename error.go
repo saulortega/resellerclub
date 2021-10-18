@@ -19,6 +19,10 @@ func (e Error) Error() string {
 	return e.err
 }
 
+func (e Error) String() string {
+	return e.err
+}
+
 func (e Error) Response() interface{} {
 	return e.res
 }
