@@ -40,13 +40,13 @@ func (domains *Domains) CheckAvailability(domainNames []string, tlds []string) (
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, somethingWentWrong(body)
+		return nil, somethingWentWrong(string(body))
 	}
 
 	mapResp := map[string]interface{}{}
 	err = json.Unmarshal(body, &mapResp)
 	if err != nil {
-		return nil, somethingWentWrong(body)
+		return nil, somethingWentWrong(string(body))
 	}
 
 	err = checkResponseError(mapResp)
