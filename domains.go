@@ -2,6 +2,7 @@ package resellerclub
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -37,10 +38,15 @@ func (domains *Domains) CheckAvailability(domainNames []string, tlds []string) (
 
 	defer resp.Body.Close()
 
-	mapResp := map[string]interface{}{}
-	err = json.NewDecoder(resp.Body).Decode(&mapResp)
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, somethingWentWrong(body)
+	}
+
+	mapResp := map[string]interface{}{}
+	err = json.Unmarshal(body, &mapResp)
+	if err != nil {
+		return nil, somethingWentWrong(body)
 	}
 
 	err = checkResponseError(mapResp)
