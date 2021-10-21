@@ -5,6 +5,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sort"
+)
+
+const (
+	DomainStatusAvailable               = "available"
+	DomainStatusRegisteredThroughUs     = "regthroughus"
+	DomainStatusRegisteredThroughOthers = "regthroughothers"
+	DomainStatusUnknown                 = "unknown"
 )
 
 type Domains struct {
@@ -78,6 +86,10 @@ func (domains *Domains) CheckAvailability(domainNames []string, tlds []string) (
 	if len(domainsAvailability) == 0 {
 		return nil, somethingWentWrong(mapResp)
 	}
+
+	sort.Slice(domainsAvailability, func(i, j int) bool {
+		return domainsAvailability[i].Domain < domainsAvailability[j].Domain
+	})
 
 	return domainsAvailability, nil
 }
