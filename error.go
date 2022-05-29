@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	ErrMissingParams      = errors.New("missing required params")
 	ErrSomethingWentWrong = errors.New("something went wrong")
 	ErrNoTLDsSelected     = errors.New("No TLDs are selected")
 )
@@ -29,6 +30,37 @@ func (e Error) Response() interface{} {
 
 func (e Error) Is(target error) bool {
 	return e.err == target.Error()
+}
+
+type errorChecker interface {
+	Err() error
+}
+
+type errorResponse struct {
+	Status     string     `json:"status"`
+	Message    string     `json:"message"`
+	ErrorValue errorValue `json:"errorvalue"`
+}
+
+type errorValue struct {
+	Error string `json:"error"`
+}
+
+func (e *errorResponse) Err() error {
+	var status = strings.ToLower(e.Status)
+	if len(status) > 0 {
+		if len(e.Message) > 0 && status == "error" {
+			return Error{e.Message, e}
+		}
+
+		return somethingWentWrong(e)
+	}
+
+	if len(e.ErrorValue.Error) > 0 {
+		return Error{e.ErrorValue.Error, e}
+	}
+
+	return nil
 }
 
 func checkResponseError(mapResp map[string]interface{}) error {
