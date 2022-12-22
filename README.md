@@ -1,5 +1,7 @@
 # resellerclub
 
+## ⚠ Supports only a few features. Development ongoing.
+
 ```go
 package main
 
